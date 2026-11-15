@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PetShop</title>
+<style>
+:root{--bg:#f2f6f4;--surface:#fff;--ink:#16302b;--muted:#5d7570;--line:#d3e0db;--brand:#1f6f66;--brand-ink:#fff;--sun:#f0b93a;--err:#b3392f;--ok:#1f6f66}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1c19;--surface:#172a26;--ink:#e6f1ee;--muted:#9bb4ae;--line:#2a443e;--brand:#4fb3a8;--brand-ink:#0f1c19;--sun:#f0b93a;--err:#ff8f84;--ok:#4fb3a8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS","Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;align-items:baseline;justify-content:space-between;padding:1.25rem clamp(1rem,4vw,3rem);border-bottom:4px solid var(--sun);background:var(--surface)}
+h1{margin:0;font-size:1.6rem;letter-spacing:-.01em}
+#conexao{font-size:.85rem;color:var(--muted)}
+nav{display:flex;gap:.25rem;padding:.75rem clamp(1rem,4vw,3rem) 0}
+nav button{border:0;background:none;color:var(--muted);font:inherit;font-weight:600;padding:.6rem 1rem;border-bottom:3px solid transparent;cursor:pointer}
+nav button[aria-selected=true]{color:var(--ink);border-color:var(--brand)}
+main{padding:1.25rem clamp(1rem,4vw,3rem) 3rem;max-width:1100px}
+section[hidden]{display:none}
+h2{font-size:1.15rem;margin:1.5rem 0 .75rem}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1rem}
+label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:.25rem}
+input,select{font:inherit;padding:.5rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+button.primary{grid-column:1/-1;justify-self:start;font:inherit;font-weight:700;padding:.6rem 1.2rem;border:0;border-radius:6px;background:var(--brand);color:var(--brand-ink);cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.badge{padding:.1rem .5rem;border-radius:99px;background:var(--sun);color:#16302b;font-size:.8rem;font-weight:700}
+#msg{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);padding:.7rem 1.1rem;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:600;max-width:90vw}
+#msg.erro{background:var(--err);color:#fff}
+#msg[hidden]{display:none}
+.vazio{padding:1rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1>PetShop</h1>
+  <span id="conexao">Conectando ao banco…</span>
+</header>
+<nav role="tablist">
+  <button role="tab" data-tab="agenda" aria-selected="true">Agenda</button>
+  <button role="tab" data-tab="clientes" aria-selected="false">Clientes</button>
+  <button role="tab" data-tab="estoque" aria-selected="false">Estoque baixo</button>
+</nav>
+<main>
+  <section id="agenda">
+    <h2>Agenda de serviços <small class="badge">view vw_agenda</small></h2>
+    <div class="table-wrap" id="tb-agenda"></div>
+    <h2>Novo agendamento</h2>
+    <form id="f-agenda">
+      <label>Pet <select name="idPet" required></select></label>
+      <label>Serviço <select name="idServico" required></select></label>
+      <label>Profissional <select name="idUsuario" required></select></label>
+      <label>Data e hora <input type="datetime-local" name="dataHora" required></label>
+      <button class="primary">Agendar</button>
+    </form>
+  </section>
+
+  <section id="clientes" hidden>
+    <h2>Clientes <small class="badge">tabela clientes</small></h2>
+    <label style="max-width:320px;margin-bottom:.75rem">Buscar por nome <input id="busca" type="search"></label>
+    <div class="table-wrap" id="tb-clientes"></div>
+    <h2>Cadastrar cliente e primeiro pet</h2>
+    <form id="f-cliente">
+      <label>Nome <input name="nome" required maxlength="100"></label>
+      <label>CPF (11 dígitos) <input name="cpf" required pattern="\d{11}" inputmode="numeric"></label>
+      <label>Telefone <input name="telefone" maxlength="20"></label>
+      <label>E-mail <input type="email" name="email" maxlength="120"></label>
+      <label>Nome do pet <input name="petNome" required maxlength="60"></label>
+      <label>Espécie
+        <select name="especie" required>
+          <option value="CAO">Cão</option><option value="GATO">Gato</option>
+          <option value="AVE">Ave</option><option value="ROEDOR">Roedor</option><option value="OUTRO">Outro</option>
+        </select></label>
+      <label>Raça <input name="raca" maxlength="60"></label>
+      <button class="primary">Cadastrar</button>
+    </form>
+  </section>
+
+  <section id="estoque" hidden>
+    <h2>Produtos para repor <small class="badge">view vw_estoque_baixo</small></h2>
+    <div class="table-wrap" id="tb-estoque"></div>
+  </section>
+</main>
+<div id="msg" hidden role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function api(url, opts) {
+  const r = await fetch(url, opts && { method: opts.method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(opts.body) });
+  const dados = await r.json();
+  if (!r.ok) throw new Error(dados.erro || 'Erro inesperado.');
+  return dados;
+}
+function aviso(texto, erro) {
+  const m = $('#msg'); m.textContent = texto; m.className = erro ? 'erro' : ''; m.hidden = false;
+  clearTimeout(aviso.t); aviso.t = setTimeout(() => m.hidden = true, 4500);
+}
+function tabela(el, colunas, linhas, vazio) {
+  if (!linhas.length) { el.innerHTML = `<p class="vazio">${vazio}</p>`; return; }
+  el.innerHTML = '<table><thead><tr>' + colunas.map(c => `<th>${c[0]}</th>`).join('') + '</tr></thead><tbody>' +
+    linhas.map(l => '<tr>' + colunas.map(c => `<td>${esc(c[1](l))}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+}
+const moeda = v => Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+async function carregarAgenda() {
+  const d = await api('/api/agenda');
+  tabela($('#tb-agenda'), [
+    ['Data e hora', l => l.data_hora.slice(0, 16).replace('T', ' ')],
+    ['Pet', l => l.pet], ['Tutor', l => l.cliente], ['Serviço', l => l.servico],
+    ['Preço', l => moeda(l.preco)], ['Profissional', l => l.profissional], ['Status', l => l.status]
+  ], d, 'Nenhum agendamento. Use o formulário abaixo para criar o primeiro.');
+}
+async function carregarClientes() {
+  const d = await api('/api/clientes?busca=' + encodeURIComponent($('#busca').value));
+  tabela($('#tb-clientes'), [
+    ['Código', l => l.id_cliente], ['Nome', l => l.nome], ['CPF', l => l.cpf],
+    ['Telefone', l => l.telefone], ['E-mail', l => l.email], ['Pets', l => l.pets]
+  ], d, 'Nenhum cliente encontrado.');
+}
+async function carregarEstoque() {
+  const d = await api('/api/estoque-baixo');
+  tabela($('#tb-estoque'), [
+    ['Código', l => l.id_produto], ['Produto', l => l.nome], ['Categoria', l => l.categoria],
+    ['Estoque', l => l.estoque], ['Mínimo', l => l.estoque_minimo]
+  ], d, 'Todos os produtos estão acima do estoque mínimo.');
+}
+async function carregarOpcoes() {
+  const [pets, servicos, profs] = await Promise.all([api('/api/pets'), api('/api/servicos'), api('/api/profissionais')]);
+  const f = $('#f-agenda');
+  const opts = (arr, v, t) => arr.map(x => `<option value="${esc(x[v])}">${esc(x[t])}</option>`).join('');
+  f.idPet.innerHTML = opts(pets, 'id_pet', 'rotulo');
+  f.idServico.innerHTML = servicos.map(s => `<option value="${esc(s.id_servico)}">${esc(s.nome)} (${s.duracao_min} min, ${moeda(s.preco)})</option>`).join('');
+  f.idUsuario.innerHTML = opts(profs, 'id_usuario', 'nome');
+}
+
+$('#f-agenda').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  try {
+    const r = await api('/api/agendamentos', { method: 'POST', body: {
+      idPet: f.idPet.value, idServico: f.idServico.value, idUsuario: f.idUsuario.value,
+      dataHora: f.dataHora.value.replace('T', ' ') + ':00' } });
+    aviso('Agendamento ' + r.id_agendamento + ' criado.');
+    carregarAgenda();
+  } catch (err) { aviso(err.message, true); }
+});
+$('#f-cliente').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  const body = Object.fromEntries(new FormData(f));
+  try {
+    const r = await api('/api/clientes', { method: 'POST', body });
+    aviso('Cliente ' + r.id_cliente + ' cadastrado.');
+    f.reset(); carregarClientes(); carregarOpcoes();
+  } catch (err) { aviso(err.message, true); }
+});
+$('#busca').addEventListener('input', () => carregarClientes().catch(e => aviso(e.message, true)));
+
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('main section').forEach(s => s.hidden = s.id !== b.dataset.tab);
+  ({ agenda: carregarAgenda, clientes: carregarClientes, estoque: carregarEstoque })[b.dataset.tab]()
+    .catch(e => aviso(e.message, true));
+}));
+
+(async () => {
+  try {
+    const w = await api('/api/whoami');
+    $('#conexao').textContent = 'Banco ' + w.banco + ' · conectado como ' + w.usuario;
+    await Promise.all([carregarAgenda(), carregarOpcoes()]);
+  } catch (e) { $('#conexao').textContent = 'Sem conexão com o banco'; aviso(e.message, true); }
+})();
+</script>
+</body>
+</html>
