@@ -1,11 +1,18 @@
 -- =====================================================================
 -- PETSHOP - Script do banco de dados (MySQL 8+)
 -- Execute com um usuário administrador (NÃO use root na aplicação).
--- Se o binlog estiver ativo: SET GLOBAL log_bin_trust_function_creators = 1;
+-- O script recria o banco e os usuários, então pode ser executado de novo.
 -- =====================================================================
+-- Necessário para criar funções com o binlog ativo (exige privilégio de administrador).
+SET NAMES utf8mb4;
+SET GLOBAL log_bin_trust_function_creators = 1;
+
 DROP DATABASE IF EXISTS petshop;
 CREATE DATABASE petshop CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE petshop;
+DROP USER IF EXISTS 'petshop_admin'@'localhost';
+CREATE USER 'petshop_admin'@'localhost' IDENTIFIED BY 'Troque#Admin2026';
+GRANT ALL PRIVILEGES ON petshop.* TO 'petshop_admin'@'localhost';
 
 -- ---------------------------------------------------------------------
 -- 1. GERAÇÃO DE IDs (regra própria: PREFIXO-000001)
@@ -325,11 +332,11 @@ DELIMITER ;
 -- Troque as senhas antes de usar!
 -- ---------------------------------------------------------------------
 -- Administrador do banco (migrações/manutenção) - restrito ao schema
-CREATE USER 'petshop_admin'@'localhost'     IDENTIFIED BY 'Troque#Admin2026';
-GRANT ALL PRIVILEGES ON petshop.* TO 'petshop_admin'@'localhost';
+
 
 -- Usuário da APLICAÇÃO: lê tudo, escreve só em cadastros; vendas e
 -- agendamentos SOMENTE via procedures. Sem DELETE, sem DDL.
+DROP USER IF EXISTS 'petshop_app'@'localhost';
 CREATE USER 'petshop_app'@'localhost'       IDENTIFIED BY 'Troque#App2026';
 GRANT SELECT ON petshop.* TO 'petshop_app'@'localhost';
 GRANT INSERT, UPDATE ON petshop.clientes TO 'petshop_app'@'localhost';
@@ -338,6 +345,7 @@ GRANT INSERT, UPDATE ON petshop.produtos TO 'petshop_app'@'localhost';
 GRANT EXECUTE ON petshop.* TO 'petshop_app'@'localhost';
 
 -- Usuário de relatórios: apenas VIEWS (somente leitura)
+DROP USER IF EXISTS 'petshop_relatorio'@'localhost';
 CREATE USER 'petshop_relatorio'@'localhost' IDENTIFIED BY 'Troque#Rel2026';
 GRANT SELECT ON petshop.vw_agenda         TO 'petshop_relatorio'@'localhost';
 GRANT SELECT ON petshop.vw_estoque_baixo  TO 'petshop_relatorio'@'localhost';
