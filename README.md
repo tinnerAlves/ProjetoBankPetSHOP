@@ -15,7 +15,8 @@ Projeto da disciplina Laboratório de Banco de Dados.
    Abra o arquivo `.env.example` no bloco de nota, copie todo o seu conteúdo e cole dentro do novo arquivo `.env` no bloco de nota.
    No arquivo `.env`, substitua o valor da senha pela senha configurada no seu banco de dados:
    ```env
-  DB_PASSWORD="defina_a_senha_do_petshop_app"
+  DB_PASSWORD="defina_a_senha_do_petshop_app".
+
 --------------------------------------------------------------
 
 
