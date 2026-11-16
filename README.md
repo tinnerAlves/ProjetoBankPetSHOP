@@ -5,20 +5,24 @@ Projeto da disciplina Laboratório de Banco de Dados.
 ## Como rodar
 1. Com um usuário administrador do MySQL, execute `petshop.sql`. Ele recria o banco `petshop`, os objetos e os usuários, e pode ser executado de novo.
 2.  `cp .env.example .env` e informe a senha do `petshop_app` (a mesma definida no script).
+----------------
+### ⚙️ Configuração das Variáveis de Ambiente (`.env`)
 
-3. O arquivo `.env.example` serve apenas como um modelo de configuração. Para que o projeto funcione, você precisa criar um arquivo `.env` real na **pasta raiz do projeto** (mesmo local onde está o `.env.example`).
---------------------------------
+O arquivo `.env.example` serve apenas como um modelo de configuração. Para que o projeto funcione, você precisa criar um arquivo `.env` real na **pasta raiz do projeto** (mesmo local onde está o `.env.example`).
+
 #### Como criar o arquivo `.env` no Windows:
-  Abra a **pasta raiz do projeto** no Explorador de Arquivos.
-   Clique com o **botão direito** em um espaço vazio > **Novo** > **Documento de Texto**.
-   Pressione `Ctrl + A` para selecionar todo o nome do arquivo (incluindo e esse cara que a gente quer mudar `.txt`), digite exatamente `.env` e pressione **Enter** *(confirme caso o Windows pergunte se deseja alterar a extensão)*.
-   Abra o arquivo `.env.example` no bloco de nota, copie todo o seu conteúdo e cole dentro do novo arquivo `.env` no bloco de nota.
-   No arquivo `.env`, substitua o valor da senha pela senha configurada no seu banco de dados:
+1. Abra a **pasta raiz do projeto** no Explorador de Arquivos.
+2. Clique com o **botão direito** em um espaço vazio > **Novo** > **Documento de Texto**.
+3. Pressione `Ctrl + A` para selecionar todo o nome do arquivo (incluindo o `.txt`), digite exatamente `.env` e pressione **Enter** *(confirme caso o Windows pergunte se deseja alterar a extensão)*.
+4. Abra o arquivo `.env.example`, copie todo o seu conteúdo e cole dentro do novo arquivo `.env`.
+5. No arquivo `.env`, substitua o valor da senha pela senha configurada no seu banco de dados:
    ```env
-  campo DB_PASSWORD=
+   DB_PASSWORD="defina_a_senha_do_petshop_app"
+   ```
+6. Salve o arquivo (`Ctrl + S`) e feche.
 
---------------------------------------------------------------
-
+> 💡 **Dica:** Caso prefira fazer via terminal (dentro da pasta raiz do projeto), basta rodar o comando `cp .env.example .env` e editar a senha em seguida.
+------------
 
 4. `npm install`
 5. `npm start` e abra http://localhost:3000
