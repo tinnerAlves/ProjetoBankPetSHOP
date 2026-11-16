@@ -16,7 +16,7 @@ Projeto da disciplina Laboratório de Banco de Dados.
    No arquivo `.env`, substitua o valor da senha pela senha configurada no seu banco de dados:
    ```env
    DB_PASSWORD="defina_a_senha_do_petshop_app"
----------------------
+-------------
 4. `npm install`
 5. `npm start` e abra http://localhost:3000
 
