@@ -30,7 +30,7 @@ INSERT INTO sequencias (nome, prefixo) VALUES
  ('produto','PRD'),('servico','SRV'),('agendamento','AGD'),('venda','VND');
 
 DELIMITER $$
-CREATE FUNCTION fn_gerar_id(p_nome VARCHAR(30)) RETURNS VARCHAR(20)
+CREATE DEFINER='petshop_admin'@'localhost' FUNCTION fn_gerar_id(p_nome VARCHAR(30)) RETURNS VARCHAR(20)
   NOT DETERMINISTIC MODIFIES SQL DATA
 BEGIN
   DECLARE v_prefixo VARCHAR(5);
@@ -166,7 +166,7 @@ CREATE INDEX idx_clientes_nome   ON clientes (nome);
 -- 4. FUNCTION auxiliar
 -- ---------------------------------------------------------------------
 DELIMITER $$
-CREATE FUNCTION fn_total_venda(p_id_venda VARCHAR(20)) RETURNS DECIMAL(12,2)
+CREATE DEFINER='petshop_admin'@'localhost' FUNCTION fn_total_venda(p_id_venda VARCHAR(20)) RETURNS DECIMAL(12,2)
   READS SQL DATA
 BEGIN
   DECLARE v_total DECIMAL(12,2);
@@ -181,7 +181,7 @@ DELIMITER ;
 -- ---------------------------------------------------------------------
 DELIMITER $$
 -- Impede vender mais do que o estoque disponível (regra de integridade)
-CREATE TRIGGER trg_itens_venda_bi BEFORE INSERT ON itens_venda
+CREATE DEFINER='petshop_admin'@'localhost' TRIGGER trg_itens_venda_bi BEFORE INSERT ON itens_venda
 FOR EACH ROW
 BEGIN
   DECLARE v_estoque INT;
@@ -192,7 +192,7 @@ BEGIN
 END$$
 
 -- Baixa automática de estoque após inserir item
-CREATE TRIGGER trg_itens_venda_ai AFTER INSERT ON itens_venda
+CREATE DEFINER='petshop_admin'@'localhost' TRIGGER trg_itens_venda_ai AFTER INSERT ON itens_venda
 FOR EACH ROW
 BEGIN
   UPDATE produtos SET estoque = estoque - NEW.quantidade
@@ -200,7 +200,7 @@ BEGIN
 END$$
 
 -- Auditoria de alteração de preço
-CREATE TRIGGER trg_produtos_bu BEFORE UPDATE ON produtos
+CREATE DEFINER='petshop_admin'@'localhost' TRIGGER trg_produtos_bu BEFORE UPDATE ON produtos
 FOR EACH ROW
 BEGIN
   IF OLD.preco <> NEW.preco THEN
@@ -214,7 +214,7 @@ DELIMITER ;
 -- 6. VIEWS
 -- ---------------------------------------------------------------------
 -- Agenda completa (junta 5 tabelas: evita JOINs repetidos na aplicação)
-CREATE VIEW vw_agenda AS
+CREATE DEFINER='petshop_admin'@'localhost' VIEW vw_agenda AS
 SELECT a.id_agendamento, a.data_hora, a.status,
        p.nome AS pet, p.especie, c.nome AS cliente, c.telefone,
        s.nome AS servico, s.preco, u.nome AS profissional
@@ -225,13 +225,13 @@ SELECT a.id_agendamento, a.data_hora, a.status,
   JOIN usuarios u ON u.id_usuario = a.id_usuario;
 
 -- Produtos que precisam de reposição (apoio à gestão)
-CREATE VIEW vw_estoque_baixo AS
+CREATE DEFINER='petshop_admin'@'localhost' VIEW vw_estoque_baixo AS
 SELECT id_produto, nome, categoria, estoque, estoque_minimo
   FROM produtos
  WHERE estoque <= estoque_minimo;
 
 -- Resumo de vendas sem expor dados sensíveis (perfil de relatórios)
-CREATE VIEW vw_vendas_resumo AS
+CREATE DEFINER='petshop_admin'@'localhost' VIEW vw_vendas_resumo AS
 SELECT v.id_venda, v.data_venda, v.status, c.nome AS cliente,
        COALESCE(SUM(i.quantidade), 0) AS qtd_itens, v.total
   FROM vendas v
@@ -245,7 +245,7 @@ SELECT v.id_venda, v.data_venda, v.status, c.nome AS cliente,
 DELIMITER $$
 
 -- Cadastra cliente + primeiro pet de forma atômica
-CREATE PROCEDURE sp_cadastrar_cliente_com_pet(
+CREATE DEFINER='petshop_admin'@'localhost' PROCEDURE sp_cadastrar_cliente_com_pet(
   IN p_nome VARCHAR(100), IN p_cpf CHAR(11), IN p_telefone VARCHAR(20),
   IN p_email VARCHAR(120), IN p_pet_nome VARCHAR(60),
   IN p_especie VARCHAR(10), IN p_raca VARCHAR(60),
@@ -263,7 +263,7 @@ BEGIN
   COMMIT;
 END$$
 
-CREATE PROCEDURE sp_abrir_venda(
+CREATE DEFINER='petshop_admin'@'localhost' PROCEDURE sp_abrir_venda(
   IN p_id_cliente VARCHAR(20), IN p_id_usuario VARCHAR(20),
   OUT p_id_venda VARCHAR(20))
 BEGIN
@@ -273,7 +273,7 @@ BEGIN
 END$$
 
 -- Adiciona item: trigger valida/baixa estoque; qualquer erro => ROLLBACK
-CREATE PROCEDURE sp_adicionar_item(
+CREATE DEFINER='petshop_admin'@'localhost' PROCEDURE sp_adicionar_item(
   IN p_id_venda VARCHAR(20), IN p_id_produto VARCHAR(20), IN p_qtd INT)
 BEGIN
   DECLARE v_preco DECIMAL(10,2);
@@ -294,7 +294,7 @@ BEGIN
 END$$
 
 -- Agenda serviço verificando conflito de horário do profissional
-CREATE PROCEDURE sp_agendar_servico(
+CREATE DEFINER='petshop_admin'@'localhost' PROCEDURE sp_agendar_servico(
   IN p_id_pet VARCHAR(20), IN p_id_servico VARCHAR(20),
   IN p_id_usuario VARCHAR(20), IN p_data_hora DATETIME,
   OUT p_id_agendamento VARCHAR(20))
@@ -321,7 +321,7 @@ BEGIN
   COMMIT;
 END$$
 
-CREATE PROCEDURE sp_finalizar_venda(IN p_id_venda VARCHAR(20))
+CREATE DEFINER='petshop_admin'@'localhost' PROCEDURE sp_finalizar_venda(IN p_id_venda VARCHAR(20))
 BEGIN
   UPDATE vendas SET status = 'FINALIZADA' WHERE id_venda = p_id_venda AND status = 'ABERTA';
 END$$
