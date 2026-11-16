@@ -7,7 +7,7 @@ Projeto da disciplina Laboratório de Banco de Dados.
 2.  `cp .env.example .env` e informe a senha do `petshop_app` (a mesma definida no script).
 
 3. O arquivo `.env.example` serve apenas como um modelo de configuração. Para que o projeto funcione, você precisa criar um arquivo `.env` real na **pasta raiz do projeto** (mesmo local onde está o `.env.example`).
--------------
+--------------------------------
 #### Como criar o arquivo `.env` no Windows:
   Abra a **pasta raiz do projeto** no Explorador de Arquivos.
    Clique com o **botão direito** em um espaço vazio > **Novo** > **Documento de Texto**.
@@ -16,8 +16,7 @@ Projeto da disciplina Laboratório de Banco de Dados.
    No arquivo `.env`, substitua o valor da senha pela senha configurada no seu banco de dados:
    ```env
   DB_PASSWORD="defina_a_senha_do_petshop_app"
-
--------------
+--------------------------------------------------------------
 
 
 4. `npm install`
